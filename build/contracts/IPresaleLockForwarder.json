@@ -1,0 +1,818 @@
+{
+  "contractName": "IPresaleLockForwarder",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20Custom",
+          "name": "_baseToken",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20Custom",
+          "name": "_saleToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_baseAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_saleAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_unlock_date",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address payable",
+          "name": "_withdrawer",
+          "type": "address"
+        }
+      ],
+      "name": "lockLiquidity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token0",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token1",
+          "type": "address"
+        }
+      ],
+      "name": "uniswapPairIsInitialised",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.0+commit.c7dfd78e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IERC20Custom\",\"name\":\"_baseToken\",\"type\":\"address\"},{\"internalType\":\"contract IERC20Custom\",\"name\":\"_saleToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_baseAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_saleAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_unlock_date\",\"type\":\"uint256\"},{\"internalType\":\"address payable\",\"name\":\"_withdrawer\",\"type\":\"address\"}],\"name\":\"lockLiquidity\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token0\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token1\",\"type\":\"address\"}],\"name\":\"uniswapPairIsInitialised\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/common/IPresaleLockForwarder.sol\":\"IPresaleLockForwarder\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/common/IERC20Custom.sol\":{\"keccak256\":\"0x1ce241c733a9d002f5c2fd5221be62b75ad8999b203bdc779eda01c9b194ae32\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://aee9748d23eb352ced0a51ca33eec3c2fc9c28d898a4b8ba9c30418bedb953de\",\"dweb:/ipfs/QmWhuPcNzNDPCxGF8WpdcbzACnYTAfYNPYMrBo5miXKcwM\"]},\"project:/contracts/common/IPresaleLockForwarder.sol\":{\"keccak256\":\"0x87a3c6db8c0c8571161d56f28dc7319219bea187ede8b04a457cd8fe1a20441c\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://8c40e91d17de0812034e26a0dd144f24442dde891cabe44718d38526c1562071\",\"dweb:/ipfs/QmSi4apSgKNmyLvLiq6KZTh3Ep75XSDMpdja8qN7bXA6St\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: UNLICENSED\r\n\r\n\r\npragma solidity ^0.8.0;\r\n\r\nimport \"./IERC20Custom.sol\";\r\n\r\ninterface IPresaleLockForwarder {\r\n    function lockLiquidity(\r\n        IERC20Custom _baseToken,\r\n        IERC20Custom _saleToken,\r\n        uint256 _baseAmount,\r\n        uint256 _saleAmount,\r\n        uint256 _unlock_date,\r\n        address payable _withdrawer\r\n    ) external;\r\n\r\n    function uniswapPairIsInitialised(address token0, address token1)\r\n        external\r\n        view\r\n        returns (bool);\r\n}\r\n",
+  "sourcePath": "C:\\Users\\Admin\\Desktop\\Test_DAOLaunch\\contracts\\common\\IPresaleLockForwarder.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/common/IPresaleLockForwarder.sol",
+    "exportedSymbols": {
+      "IERC20Custom": [
+        967
+      ],
+      "IPresaleLockForwarder": [
+        1061
+      ]
+    },
+    "id": 1062,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1033,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "44:23:8"
+      },
+      {
+        "absolutePath": "project:/contracts/common/IERC20Custom.sol",
+        "file": "./IERC20Custom.sol",
+        "id": 1034,
+        "nodeType": "ImportDirective",
+        "scope": 1062,
+        "sourceUnit": 968,
+        "src": "71:28:8",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1061,
+        "linearizedBaseContracts": [
+          1061
+        ],
+        "name": "IPresaleLockForwarder",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "2277d0e3",
+            "id": 1051,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "lockLiquidity",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1049,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1037,
+                  "mutability": "mutable",
+                  "name": "_baseToken",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "175:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                    "typeString": "contract IERC20Custom"
+                  },
+                  "typeName": {
+                    "id": 1036,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 1035,
+                      "name": "IERC20Custom",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 967,
+                      "src": "175:12:8"
+                    },
+                    "referencedDeclaration": 967,
+                    "src": "175:12:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                      "typeString": "contract IERC20Custom"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1040,
+                  "mutability": "mutable",
+                  "name": "_saleToken",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "209:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                    "typeString": "contract IERC20Custom"
+                  },
+                  "typeName": {
+                    "id": 1039,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 1038,
+                      "name": "IERC20Custom",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 967,
+                      "src": "209:12:8"
+                    },
+                    "referencedDeclaration": 967,
+                    "src": "209:12:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                      "typeString": "contract IERC20Custom"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1042,
+                  "mutability": "mutable",
+                  "name": "_baseAmount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "243:19:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1041,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "243:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1044,
+                  "mutability": "mutable",
+                  "name": "_saleAmount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "273:19:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1043,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "273:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1046,
+                  "mutability": "mutable",
+                  "name": "_unlock_date",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "303:20:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1045,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "303:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1048,
+                  "mutability": "mutable",
+                  "name": "_withdrawer",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "334:27:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  },
+                  "typeName": {
+                    "id": 1047,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "334:15:8",
+                    "stateMutability": "payable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "164:204:8"
+            },
+            "returnParameters": {
+              "id": 1050,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "377:0:8"
+            },
+            "scope": 1061,
+            "src": "142:236:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "8d8c70bb",
+            "id": 1060,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "uniswapPairIsInitialised",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1056,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1053,
+                  "mutability": "mutable",
+                  "name": "token0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1060,
+                  "src": "420:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1052,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "420:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1055,
+                  "mutability": "mutable",
+                  "name": "token1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1060,
+                  "src": "436:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1054,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "436:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "419:32:8"
+            },
+            "returnParameters": {
+              "id": 1059,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1058,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1060,
+                  "src": "502:4:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1057,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "502:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "501:6:8"
+            },
+            "scope": 1061,
+            "src": "386:122:8",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1062,
+        "src": "103:408:8"
+      }
+    ],
+    "src": "44:469:8"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/common/IPresaleLockForwarder.sol",
+    "exportedSymbols": {
+      "IERC20Custom": [
+        967
+      ],
+      "IPresaleLockForwarder": [
+        1061
+      ]
+    },
+    "id": 1062,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1033,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "44:23:8"
+      },
+      {
+        "absolutePath": "project:/contracts/common/IERC20Custom.sol",
+        "file": "./IERC20Custom.sol",
+        "id": 1034,
+        "nodeType": "ImportDirective",
+        "scope": 1062,
+        "sourceUnit": 968,
+        "src": "71:28:8",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1061,
+        "linearizedBaseContracts": [
+          1061
+        ],
+        "name": "IPresaleLockForwarder",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "2277d0e3",
+            "id": 1051,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "lockLiquidity",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1049,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1037,
+                  "mutability": "mutable",
+                  "name": "_baseToken",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "175:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                    "typeString": "contract IERC20Custom"
+                  },
+                  "typeName": {
+                    "id": 1036,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 1035,
+                      "name": "IERC20Custom",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 967,
+                      "src": "175:12:8"
+                    },
+                    "referencedDeclaration": 967,
+                    "src": "175:12:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                      "typeString": "contract IERC20Custom"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1040,
+                  "mutability": "mutable",
+                  "name": "_saleToken",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "209:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                    "typeString": "contract IERC20Custom"
+                  },
+                  "typeName": {
+                    "id": 1039,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 1038,
+                      "name": "IERC20Custom",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 967,
+                      "src": "209:12:8"
+                    },
+                    "referencedDeclaration": 967,
+                    "src": "209:12:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20Custom_$967",
+                      "typeString": "contract IERC20Custom"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1042,
+                  "mutability": "mutable",
+                  "name": "_baseAmount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "243:19:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1041,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "243:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1044,
+                  "mutability": "mutable",
+                  "name": "_saleAmount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "273:19:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1043,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "273:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1046,
+                  "mutability": "mutable",
+                  "name": "_unlock_date",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "303:20:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1045,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "303:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1048,
+                  "mutability": "mutable",
+                  "name": "_withdrawer",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1051,
+                  "src": "334:27:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  },
+                  "typeName": {
+                    "id": 1047,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "334:15:8",
+                    "stateMutability": "payable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "164:204:8"
+            },
+            "returnParameters": {
+              "id": 1050,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "377:0:8"
+            },
+            "scope": 1061,
+            "src": "142:236:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "8d8c70bb",
+            "id": 1060,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "uniswapPairIsInitialised",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1056,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1053,
+                  "mutability": "mutable",
+                  "name": "token0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1060,
+                  "src": "420:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1052,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "420:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1055,
+                  "mutability": "mutable",
+                  "name": "token1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1060,
+                  "src": "436:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1054,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "436:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "419:32:8"
+            },
+            "returnParameters": {
+              "id": 1059,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1058,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1060,
+                  "src": "502:4:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1057,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "502:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "501:6:8"
+            },
+            "scope": 1061,
+            "src": "386:122:8",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1062,
+        "src": "103:408:8"
+      }
+    ],
+    "src": "44:469:8"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.4",
+  "updatedAt": "2022-04-10T09:53:49.063Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
