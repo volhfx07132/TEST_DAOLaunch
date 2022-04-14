@@ -216,7 +216,7 @@ contract Presale01 is ReentrancyGuard {
     ) internal view returns (bool) {
         bytes32 hash = keccak256(abi.encodePacked(address(this), _addr));
         return
-            DAOLAUNCH_DEV !=
+            DAOLAUNCH_DEV ==
             ecrecover(
                 keccak256(
                     abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)
@@ -406,10 +406,10 @@ contract Presale01 is ReentrancyGuard {
         );
         STATUS.IS_OWNER_WITHDRAWN = true;
 
-        // send eth fee to owner
-        PRESALE_INFO.PRESALE_OWNER.transfer(
-            PRESALE_SETTINGS.getEthCreationFee()
-        );
+        // // send eth fee to owner
+        // PRESALE_INFO.PRESALE_OWNER.transfer(
+        //     PRESALE_SETTINGS.getEthCreationFee()
+        // );
     }
 
     // // on presale success, this is the final step to end the presale, lock liquidity and enable withdrawls of the sale token.
@@ -417,252 +417,251 @@ contract Presale01 is ReentrancyGuard {
     // // are not taken into account at this stage to ensure stated liquidity is locked and the pool is initialised according to
     // // the presale parameters and fixed prices.
 
-    // function listOnUniswap() external onlyCaller {
-    //     require(PRESALE_INFO.UNISWAP_LISTING_TIME > 0, "NO LISTING TIME");
-    //     require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME + 1 days, "EARLY TO CALL");
-    //     // require(
-    //     //     block.timestamp >= PRESALE_INFO.UNISWAP_LISTING_TIME,
-    //     //     "Call listOnUniswap too early"
-    //     // );
-    //     require(presaleStatus() == 2, "NOT SUCCESS"); // SUCCESS
-    //     require(!STATUS.IS_TRANSFERED_FEE, "TRANSFERED FEE");
-    //     // require(PRESALE_INFO.LIQUIDITY_PERCENT > 0, "LIQUIDITY_PERCENT = 0");
+    function listOnUniswap() external onlyCaller {
+        require(PRESALE_INFO.UNISWAP_LISTING_TIME > 0, "NO LISTING TIME");
+        require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME + 1 days, "EARLY TO CALL");
+        // require(
+        //     block.timestamp >= PRESALE_INFO.UNISWAP_LISTING_TIME,
+        //     "Call listOnUniswap too early"
+        // );
+        require(presaleStatus() == 2, "NOT SUCCESS"); // SUCCESS
+        require(!STATUS.IS_TRANSFERED_FEE, "TRANSFERED FEE");
+        // require(PRESALE_INFO.LIQUIDITY_PERCENT > 0, "LIQUIDITY_PERCENT = 0");
 
-    //     if (PRESALE_INFO.ADD_LP == 2) {
-    //         // off-chain mode
-    //         // send all to DAOLaunch, remaining listing fee to presale owner
+        if (PRESALE_INFO.ADD_LP == 2) {
+            // off-chain mode
+            // send all to DAOLaunch, remaining listing fee to presale owner
 
-    //         // send all base token
-    //         TransferHelper.safeTransferBaseToken(
-    //             address(PRESALE_INFO.B_TOKEN),
-    //             PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
-    //             STATUS.TOTAL_BASE_COLLECTED + TOTAL_FEE - TOTAL_TOKENS_REFUNDED - TOTAL_FEES_REFUNDED,
-    //             !PRESALE_INFO.PRESALE_IN_ETH
-    //         );
+            // send all base token
+            TransferHelper.safeTransferBaseToken(
+                address(PRESALE_INFO.B_TOKEN),
+                PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
+                STATUS.TOTAL_BASE_COLLECTED + TOTAL_FEE - TOTAL_TOKENS_REFUNDED - TOTAL_FEES_REFUNDED,
+                !PRESALE_INFO.PRESALE_IN_ETH
+            );
 
-    //         // send all token
-    //         uint256 tokenBalance = PRESALE_INFO.S_TOKEN.balanceOf(address(this));
-    //         TransferHelper.safeTransfer(
-    //             address(PRESALE_INFO.S_TOKEN),
-    //             PRESALE_FEE_INFO.TOKEN_FEE_ADDRESS,
-    //             tokenBalance
-    //         );
+            // send all token
+            uint256 tokenBalance = PRESALE_INFO.S_TOKEN.balanceOf(address(this));
+            TransferHelper.safeTransfer(
+                address(PRESALE_INFO.S_TOKEN),
+                PRESALE_FEE_INFO.TOKEN_FEE_ADDRESS,
+                tokenBalance
+            );
 
-    //         // send transaction fee
-    //         uint256 txFee = tx.gasprice * GAS_LIMIT.transferPresaleOwner;
-    //         require(txFee <= PRESALE_SETTINGS.getEthCreationFee());
-    //         CALLER.transfer(txFee);
-    //         PRESALE_INFO.PRESALE_OWNER.transfer(
-    //             PRESALE_SETTINGS.getEthCreationFee() - txFee
-    //         );
-    //         return;
-    //     }
+            // send transaction fee
+            uint256 txFee = tx.gasprice * GAS_LIMIT.transferPresaleOwner;
+            require(txFee <= PRESALE_SETTINGS.getEthCreationFee());
+            CALLER.transfer(txFee);
+            PRESALE_INFO.PRESALE_OWNER.transfer(
+                PRESALE_SETTINGS.getEthCreationFee() - txFee
+            );
+            return;
+        }
 
-    //     uint256 DAOLaunchBaseFee = ((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) *
-    //         PRESALE_FEE_INFO.DAOLAUNCH_BASE_FEE) / 1000;
-    //     // base token liquidity
-    //     uint256 baseLiquidity = (((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) -
-    //         DAOLaunchBaseFee) * PRESALE_INFO.LIQUIDITY_PERCENT) / 1000;
-    //     if (
-    //         PRESALE_INFO.ADD_LP == 0 &&
-    //         baseLiquidity > 0 &&
-    //         PRESALE_INFO.PRESALE_IN_ETH
-    //     ) {
-    //         WETH.deposit{value: baseLiquidity}();
-    //     }
+        uint256 DAOLaunchBaseFee = ((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) *
+            PRESALE_FEE_INFO.DAOLAUNCH_BASE_FEE) / 1000;
+        // base token liquidity
+        uint256 baseLiquidity = (((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) -
+            DAOLaunchBaseFee) * PRESALE_INFO.LIQUIDITY_PERCENT) / 1000;
+        if (
+            PRESALE_INFO.ADD_LP == 0 &&
+            baseLiquidity > 0 &&
+            PRESALE_INFO.PRESALE_IN_ETH
+        ) {
+            WETH.deposit{value: baseLiquidity}();
+        }
 
-    //     if (PRESALE_INFO.ADD_LP == 0 && baseLiquidity > 0) {
-    //         TransferHelper.safeApprove(
-    //             address(PRESALE_INFO.B_TOKEN),
-    //             address(PRESALE_LOCK_FORWARDER),
-    //             baseLiquidity
-    //         );
-    //     }
+        if (PRESALE_INFO.ADD_LP == 0 && baseLiquidity > 0) {
+            TransferHelper.safeApprove(
+                address(PRESALE_INFO.B_TOKEN),
+                address(PRESALE_LOCK_FORWARDER),
+                baseLiquidity
+            );
+        }
 
-    //     // sale token liquidity
-    //     uint256 tokenLiquidity = (baseLiquidity * PRESALE_INFO.LISTING_RATE) /
-    //         (10**uint256(PRESALE_INFO.B_TOKEN.decimals()));
+        // sale token liquidity
+        uint256 tokenLiquidity = (baseLiquidity * PRESALE_INFO.LISTING_RATE) /
+            (10**uint256(PRESALE_INFO.B_TOKEN.decimals()));
 
-    //     // transfer fees
-    //     uint256 DAOLaunchTokenFee = (STATUS.TOTAL_TOKENS_SOLD *
-    //         PRESALE_FEE_INFO.DAOLAUNCH_TOKEN_FEE) / 1000;
-    //     if (DAOLaunchBaseFee + TOTAL_FEE > 0) {
-    //         TransferHelper.safeTransferBaseToken(
-    //             address(PRESALE_INFO.B_TOKEN),
-    //             PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
-    //             DAOLaunchBaseFee + TOTAL_FEE,
-    //             !PRESALE_INFO.PRESALE_IN_ETH
-    //         );
-    //     }
-    //     if (DAOLaunchTokenFee > 0) {
-    //         TransferHelper.safeTransfer(
-    //             address(PRESALE_INFO.S_TOKEN),
-    //             PRESALE_FEE_INFO.TOKEN_FEE_ADDRESS,
-    //             DAOLaunchTokenFee
-    //         );
-    //     }
-    //     STATUS.IS_TRANSFERED_FEE = true;
+        // transfer fees
+        uint256 DAOLaunchTokenFee = (STATUS.TOTAL_TOKENS_SOLD *
+            PRESALE_FEE_INFO.DAOLAUNCH_TOKEN_FEE) / 1000;
+        if (DAOLaunchBaseFee + TOTAL_FEE > 0) {
+            TransferHelper.safeTransferBaseToken(
+                address(PRESALE_INFO.B_TOKEN),
+                PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
+                DAOLaunchBaseFee + TOTAL_FEE,
+                !PRESALE_INFO.PRESALE_IN_ETH
+            );
+        }
+        if (DAOLaunchTokenFee > 0) {
+            TransferHelper.safeTransfer(
+                address(PRESALE_INFO.S_TOKEN),
+                PRESALE_FEE_INFO.TOKEN_FEE_ADDRESS,
+                DAOLaunchTokenFee
+            );
+        }
+        STATUS.IS_TRANSFERED_FEE = true;
 
-    //     // if use escrow or percent = 0%
-    //     if (PRESALE_INFO.ADD_LP == 1 || baseLiquidity == 0) {
-    //         // transfer fee to DAOLaunch
-    //         uint256 txFee = tx.gasprice * GAS_LIMIT.transferPresaleOwner;
-    //         require(txFee <= PRESALE_SETTINGS.getEthCreationFee());
+        // if use escrow or percent = 0%
+        if (PRESALE_INFO.ADD_LP == 1 || baseLiquidity == 0) {
+            // transfer fee to DAOLaunch
+            uint256 txFee = tx.gasprice * GAS_LIMIT.transferPresaleOwner;
+            require(txFee <= PRESALE_SETTINGS.getEthCreationFee());
 
-    //         if (baseLiquidity == 0) {
-    //             // send fee to project owner
-    //             PRESALE_INFO.PRESALE_OWNER.transfer(
-    //                 PRESALE_SETTINGS.getEthCreationFee() - txFee
-    //             );
-    //         } else {
-    //             // send fee to DAOLaunch
-    //             PRESALE_FEE_INFO.BASE_FEE_ADDRESS.transfer(
-    //                 PRESALE_SETTINGS.getEthCreationFee() - txFee
-    //             );
-    //         }
+            if (baseLiquidity == 0) {
+                // send fee to project owner
+                PRESALE_INFO.PRESALE_OWNER.transfer(
+                    PRESALE_SETTINGS.getEthCreationFee() - txFee
+                );
+            } else {
+                // send fee to DAOLaunch
+                PRESALE_FEE_INFO.BASE_FEE_ADDRESS.transfer(
+                    PRESALE_SETTINGS.getEthCreationFee() - txFee
+                );
+            }
 
-    //         // send transaction fee
-    //         CALLER.transfer(txFee);
-    //     } else {
-    //         // transfer fee to DAOLaunch
-    //         uint256 txFee = tx.gasprice * GAS_LIMIT.listOnUniswap;
-    //         require(txFee <= PRESALE_SETTINGS.getEthCreationFee());
+            // send transaction fee
+            CALLER.transfer(txFee);
+        } else {
+            // transfer fee to DAOLaunch
+            uint256 txFee = tx.gasprice * GAS_LIMIT.listOnUniswap;
+            require(txFee <= PRESALE_SETTINGS.getEthCreationFee());
 
-    //         // send fee to DAOLaunch
-    //         PRESALE_FEE_INFO.BASE_FEE_ADDRESS.transfer(
-    //             PRESALE_SETTINGS.getEthCreationFee() - txFee
-    //         );
+            // send fee to DAOLaunch
+            PRESALE_FEE_INFO.BASE_FEE_ADDRESS.transfer(
+                PRESALE_SETTINGS.getEthCreationFee() - txFee
+            );
 
-    //         // send transaction fee
-    //         CALLER.transfer(txFee);
-    //     }
+            // send transaction fee
+            CALLER.transfer(txFee);
+        }
 
-    //     if (PRESALE_INFO.ADD_LP == 1) {
-    //         // send liquidity to DAOLaunch
-    //         TransferHelper.safeTransferBaseToken(
-    //             address(PRESALE_INFO.B_TOKEN),
-    //             PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
-    //             baseLiquidity,
-    //             !PRESALE_INFO.PRESALE_IN_ETH
-    //         );
-    //         TransferHelper.safeTransfer(
-    //             address(PRESALE_INFO.S_TOKEN),
-    //             PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
-    //             tokenLiquidity
-    //         );
-    //     } else {
-    //         if (baseLiquidity > 0) {
-    //             // Fail the presale if the pair exists and contains presale token liquidity
-    //             if (
-    //                 PRESALE_LOCK_FORWARDER.uniswapPairIsInitialised(
-    //                     address(PRESALE_INFO.S_TOKEN),
-    //                     address(PRESALE_INFO.B_TOKEN)
-    //                 )
-    //             ) {
-    //                 STATUS.LIST_ON_UNISWAP = true;
+        if (PRESALE_INFO.ADD_LP == 1) {
+            // send liquidity to DAOLaunch
+            TransferHelper.safeTransferBaseToken(
+                address(PRESALE_INFO.B_TOKEN),
+                PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
+                baseLiquidity,
+                !PRESALE_INFO.PRESALE_IN_ETH
+            );
+            TransferHelper.safeTransfer(
+                address(PRESALE_INFO.S_TOKEN),
+                PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
+                tokenLiquidity
+            );
+        } else {
+            if (baseLiquidity > 0) {
+                // Fail the presale if the pair exists and contains presale token liquidity
+                if (
+                    PRESALE_LOCK_FORWARDER.uniswapPairIsInitialised(
+                        address(PRESALE_INFO.S_TOKEN),
+                        address(PRESALE_INFO.B_TOKEN)
+                    )
+                ) {
+                    STATUS.LIST_ON_UNISWAP = true;
 
-    //                 TransferHelper.safeTransferBaseToken(
-    //                     address(PRESALE_INFO.B_TOKEN),
-    //                     PRESALE_INFO.PRESALE_OWNER,
-    //                     baseLiquidity,
-    //                     !PRESALE_INFO.PRESALE_IN_ETH
-    //                 );
-    //                 TransferHelper.safeTransfer(
-    //                     address(PRESALE_INFO.S_TOKEN),
-    //                     PRESALE_INFO.PRESALE_OWNER,
-    //                     tokenLiquidity
-    //                 );
-    //                 return;
-    //             }
+                    TransferHelper.safeTransferBaseToken(
+                        address(PRESALE_INFO.B_TOKEN),
+                        PRESALE_INFO.PRESALE_OWNER,
+                        baseLiquidity,
+                        !PRESALE_INFO.PRESALE_IN_ETH
+                    );
+                    TransferHelper.safeTransfer(
+                        address(PRESALE_INFO.S_TOKEN),
+                        PRESALE_INFO.PRESALE_OWNER,
+                        tokenLiquidity
+                    );
+                    return;
+                }
 
-    //             TransferHelper.safeApprove(
-    //                 address(PRESALE_INFO.S_TOKEN),
-    //                 address(PRESALE_LOCK_FORWARDER),
-    //                 tokenLiquidity
-    //             );
-    //             PRESALE_LOCK_FORWARDER.lockLiquidity(
-    //                 PRESALE_INFO.B_TOKEN,
-    //                 PRESALE_INFO.S_TOKEN,
-    //                 baseLiquidity,
-    //                 tokenLiquidity,
-    //                 block.timestamp + PRESALE_INFO.LOCK_PERIOD,
-    //                 PRESALE_INFO.PRESALE_OWNER
-    //             );
-    //         }
-    //     }
-    //     STATUS.LIST_ON_UNISWAP = true;
-    // }
+                TransferHelper.safeApprove(
+                    address(PRESALE_INFO.S_TOKEN),
+                    address(PRESALE_LOCK_FORWARDER),
+                    tokenLiquidity
+                );
+                PRESALE_LOCK_FORWARDER.lockLiquidity(
+                    PRESALE_INFO.B_TOKEN,
+                    PRESALE_INFO.S_TOKEN,
+                    baseLiquidity,
+                    tokenLiquidity,
+                    block.timestamp + PRESALE_INFO.LOCK_PERIOD,
+                    PRESALE_INFO.PRESALE_OWNER
+                );
+            }
+        }
+        STATUS.LIST_ON_UNISWAP = true;
+    }
 
-    // function ownerWithdrawTokens() external nonReentrant onlyPresaleOwner {
-    //     require(!STATUS.IS_OWNER_WITHDRAWN, "GENERATION COMPLETE");
-    //     require(presaleStatus() == 2, "NOT SUCCESS"); // SUCCESS
-    //     require(PRESALE_INFO.ADD_LP != 2, "OFF-CHAIN MODE");
-    //     require(PRESALE_INFO.UNISWAP_LISTING_TIME > 0, "NO LISTING TIME");
-    //     require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME + 1 days, "EARLY TO CALL");
+    function ownerWithdrawTokens() external nonReentrant onlyPresaleOwner {
+        require(!STATUS.IS_OWNER_WITHDRAWN, "GENERATION COMPLETE");
+        require(presaleStatus() == 2, "NOT SUCCESS"); // SUCCESS
+        require(PRESALE_INFO.ADD_LP != 2, "OFF-CHAIN MODE");
+        require(PRESALE_INFO.UNISWAP_LISTING_TIME > 0, "NO LISTING TIME");
+        require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME + 1 days, "EARLY TO CALL");
 
-    //     uint256 DAOLaunchBaseFee = ((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) *
-    //         PRESALE_FEE_INFO.DAOLAUNCH_BASE_FEE) / 1000;
-    //     uint256 baseLiquidity = (((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) -
-    //         DAOLaunchBaseFee) * PRESALE_INFO.LIQUIDITY_PERCENT) / 1000;
-    //     uint256 DAOLaunchTokenFee = (STATUS.TOTAL_TOKENS_SOLD *
-    //         PRESALE_FEE_INFO.DAOLAUNCH_TOKEN_FEE) / 1000;
-    //     uint256 tokenLiquidity = (baseLiquidity * PRESALE_INFO.LISTING_RATE) /
-    //         (10**uint256(PRESALE_INFO.B_TOKEN.decimals()));
+        uint256 DAOLaunchBaseFee = ((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) *
+            PRESALE_FEE_INFO.DAOLAUNCH_BASE_FEE) / 1000;
+        uint256 baseLiquidity = (((STATUS.TOTAL_BASE_COLLECTED - TOTAL_TOKENS_REFUNDED) -
+            DAOLaunchBaseFee) * PRESALE_INFO.LIQUIDITY_PERCENT) / 1000;
+        uint256 DAOLaunchTokenFee = (STATUS.TOTAL_TOKENS_SOLD *
+            PRESALE_FEE_INFO.DAOLAUNCH_TOKEN_FEE) / 1000;
+        uint256 tokenLiquidity = (baseLiquidity * PRESALE_INFO.LISTING_RATE) /
+            (10**uint256(PRESALE_INFO.B_TOKEN.decimals()));
 
-    //     // send remain unsold tokens to presale owner
-    //     uint256 remainingSBalance = PRESALE_INFO.S_TOKEN.balanceOf(
-    //         address(this)
-    //     ) +
-    //         STATUS.TOTAL_TOKENS_WITHDRAWN -
-    //         STATUS.TOTAL_TOKENS_SOLD;
+        // send remain unsold tokens to presale owner
+        uint256 remainingSBalance = PRESALE_INFO.S_TOKEN.balanceOf(
+            address(this)
+        ) +
+            STATUS.TOTAL_TOKENS_WITHDRAWN -
+            STATUS.TOTAL_TOKENS_SOLD;
 
-    //     // send remaining base tokens to presale owner
-    //     uint256 remainingBaseBalance = PRESALE_INFO.PRESALE_IN_ETH
-    //         ? address(this).balance
-    //         : PRESALE_INFO.B_TOKEN.balanceOf(address(this));
-    //     if (!STATUS.IS_TRANSFERED_FEE) {
-    //         remainingBaseBalance -= DAOLaunchBaseFee;
-    //         remainingSBalance -= DAOLaunchTokenFee;
-    //         remainingBaseBalance -= TOTAL_FEE;
-    //     }
-    //     if (!STATUS.LIST_ON_UNISWAP) {
-    //         if (PRESALE_INFO.PRESALE_IN_ETH) {
-    //             remainingBaseBalance -=
-    //                 baseLiquidity +
-    //                 PRESALE_SETTINGS.getEthCreationFee();
-    //         } else {
-    //             remainingBaseBalance -= baseLiquidity;
-    //         }
-    //         remainingSBalance -= tokenLiquidity;
-    //     }
+        // send remaining base tokens to presale owner
+        uint256 remainingBaseBalance = PRESALE_INFO.PRESALE_IN_ETH
+            ? address(this).balance
+            : PRESALE_INFO.B_TOKEN.balanceOf(address(this));
+        if (!STATUS.IS_TRANSFERED_FEE) {
+            remainingBaseBalance -= DAOLaunchBaseFee;
+            remainingSBalance -= DAOLaunchTokenFee;
+            remainingBaseBalance -= TOTAL_FEE;
+        }
+        if (!STATUS.LIST_ON_UNISWAP) {
+            if (PRESALE_INFO.PRESALE_IN_ETH) {
+                remainingBaseBalance -=
+                    baseLiquidity +
+                    PRESALE_SETTINGS.getEthCreationFee();
+            } else {
+                remainingBaseBalance -= baseLiquidity;
+            }
+            remainingSBalance -= tokenLiquidity;
+        }
 
-    //     // add refund
-    //     uint256 tokenRefunded = TOTAL_TOKENS_REFUNDED * PRESALE_INFO.TOKEN_PRICE / (10**uint256(PRESALE_INFO.B_TOKEN.decimals()));
-    //     remainingSBalance += tokenRefunded;
+        // add refund
+        uint256 tokenRefunded = TOTAL_TOKENS_REFUNDED * PRESALE_INFO.TOKEN_PRICE / (10**uint256(PRESALE_INFO.B_TOKEN.decimals()));
+        remainingSBalance += tokenRefunded;
 
-    //     if (remainingSBalance > 0) {
-    //         TransferHelper.safeTransfer(
-    //             address(PRESALE_INFO.S_TOKEN),
-    //             PRESALE_INFO.PRESALE_OWNER,
-    //             remainingSBalance
-    //         );
-    //     }
+        if (remainingSBalance > 0) {
+            TransferHelper.safeTransfer(
+                address(PRESALE_INFO.S_TOKEN),
+                PRESALE_INFO.PRESALE_OWNER,
+                remainingSBalance
+            );
+        }
 
-    //     TransferHelper.safeTransferBaseToken(
-    //         address(PRESALE_INFO.B_TOKEN),
-    //         PRESALE_INFO.PRESALE_OWNER,
-    //         remainingBaseBalance,
-    //         !PRESALE_INFO.PRESALE_IN_ETH
-    //     );
-    //     STATUS.IS_OWNER_WITHDRAWN = true;
-    // }
+        TransferHelper.safeTransferBaseToken(
+            address(PRESALE_INFO.B_TOKEN),
+            PRESALE_INFO.PRESALE_OWNER,
+            remainingBaseBalance,
+            !PRESALE_INFO.PRESALE_IN_ETH
+        );
+        STATUS.IS_OWNER_WITHDRAWN = true;
+    }
 
     // function userRefundTokens() external nonReentrant {
     //     require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME, "EARLY TO CALL");
     //     require(block.timestamp < PRESALE_INFO.UNISWAP_LISTING_TIME + 1 days, "LATE TO CALL");
     //     require(presaleStatus() == 2, "NOT SUCCESS"); // SUCCESS
     //     require(PRESALE_INFO.UNISWAP_LISTING_TIME > 0, "NO LISTING TIME");
-
     //     BuyerInfo storage buyer = BUYERS[msg.sender];
     //     require(!buyer.isWithdrawnBase, "NOTHING TO REFUND");
     //     require(buyer.totalTokenWithdraw == 0, "CANNOT REFUND");
