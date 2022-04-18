@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
-
-import "../unitls/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "../common/IERC20Custom.sol";
-import "./Presale01.sol";
+import "./Presale02.sol";
 import "../common/TransferHelper.sol";
 import "../common/PresaleHelper.sol";
 import "../common/IPresaleFactory.sol";
 import "../common/IUniswapV2Locker.sol";
-import "../unitls/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract PresaleGenerator01 is Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -30,10 +29,6 @@ contract PresaleGenerator01 is Ownable {
         uint256 endtime;
         uint256 lockPeriod;
         uint256 uniswapListingTime;
-        // New variable
-        uint256 timeToReplaceWhileList;
-        uint256 timeToSwitchAnyone;
-        uint256 maxSendPerBuyerAfterSwitchAnyone;
     }
 
     modifier onlyAdmin() {
@@ -65,16 +60,16 @@ contract PresaleGenerator01 is Ownable {
         IERC20Custom _baseToken,
         bool is_white_list,
         bool is_approve_refund,
-        bool is_while_replacement,
-        bool is_switch_anyone,
-        uint256[15] memory uint_params,
+        uint256[12] memory uint_params,
         address payable _caller,
+        // Add new data uint_refund_params
         uint256[2] memory uint_refund_params,
+        // Add new array distributuibTime
         uint256[] memory distributionTime,
+        // Add new array unlockRate
         uint256[] memory unlockRate,
-        uint8 _addLP
+        uint8 _addLP // 0: smart contract, 1: only distribution, 2: off-chain
     ) public payable {
-        //newPresale.ownerAddNewVestingPeriod(params.distributionTime, params.unlockRate);
         PresaleParams memory params;
         params.amount = uint_params[0];
         params.tokenPrice = uint_params[1];
@@ -88,11 +83,6 @@ contract PresaleGenerator01 is Ownable {
         params.endtime = uint_params[9];
         params.lockPeriod = uint_params[10];
         params.uniswapListingTime = uint_params[11];
-        params.timeToReplaceWhileList = uint_params[12];
-        params.timeToSwitchAnyone = uint_params[13];
-        params.maxSendPerBuyerAfterSwitchAnyone = uint_params[14];
-        // require(params.uniswapListingTime > params.endtime);
-        // Charge ETH fee for contract creation
         require(
             msg.value == PRESALE_SETTINGS.getEthCreationFee(),
             "FEE NOT MET"
@@ -100,13 +90,21 @@ contract PresaleGenerator01 is Ownable {
 
         // require(params.amount >= 10000, "MIN DIVIS"); // minimum divisibility
         require(params.endtime > params.starttime, "INVALID BLOCK TIME");
+
         require(params.tokenPrice * params.hardcap > 0, "INVALID PARAMS"); // ensure no overflow for future calculations
+
         require(
             // params.liquidityPercent >= 300 &&
             params.liquidityPercent <= 1000,
             "MIN LIQUIDITY"
         ); // 30% minimum liquidity lock
 
+        if(is_approve_refund){
+            // refund Fee ( 0 - 20% )
+            require(uint_refund_params[0] >= 0 && uint_refund_params[0] <= 20, "INVALID REFUND FEE");
+            // refund Time ( 1 -24h ) convert to unix time
+            require(uint_refund_params[1] >= 3600 && uint_refund_params[1] <= 86400, "INVALID REFUND TIME");
+        }
         uint256 tokensRequiredForPresale = PresaleHelper
             .calculateAmountRequired(
                 params.amount,
@@ -124,7 +122,8 @@ contract PresaleGenerator01 is Ownable {
             address(newPresale),
             tokensRequiredForPresale
         );
-        uint256[14] memory tmpData = [
+
+        uint256[11] memory tmpData = [
             uint_params[0],
             uint_params[1],
             uint_params[2],
@@ -135,12 +134,9 @@ contract PresaleGenerator01 is Ownable {
             uint_params[7],
             uint_params[8],
             uint_params[9],
-            uint_params[10],
-            uint_params[11],
-            uint_params[12],
-            uint_params[13]
+            uint_params[10]
         ];
-
+        
         newPresale.init1(_presaleOwner, tmpData);
 
         uint256[3] memory tmpData2 = [
@@ -148,7 +144,6 @@ contract PresaleGenerator01 is Ownable {
             PRESALE_SETTINGS.getTokenFee(),
             uint_params[11]
         ];
-
         newPresale.init2(
             _baseToken,
             _presaleToken,
@@ -157,8 +152,8 @@ contract PresaleGenerator01 is Ownable {
             PRESALE_SETTINGS.getTokenAddress()
         );
 
-        //newPresale.ownerAddNewVestingPeriod(distributionTime, unlockRate);
-        newPresale.init3(is_white_list, is_approve_refund, is_while_replacement, is_switch_anyone, _caller, _addLP, uint_refund_params, percentFee);
+        newPresale.ownerAddNewVestingPeriod(distributionTime, unlockRate);
+        newPresale.init3(is_white_list, _caller, is_approve_refund, _addLP, uint_refund_params, percentFee);
         PRESALE_FACTORY.registerPresale(address(newPresale));
     }
 

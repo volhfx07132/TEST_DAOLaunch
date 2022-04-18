@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../unitls/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../common/TransferHelper.sol";
 import "../common/IUniswapV2Factory.sol";
 import "../common/IPresaleLockForwarder.sol";
@@ -29,11 +29,6 @@ contract Presale01 is ReentrancyGuard {
         uint256 UNISWAP_LISTING_TIME;
         bool PRESALE_IN_ETH; // if this flag is true the presale is raising ETH, otherwise an ERC20 token such as DAI
         uint8 ADD_LP;
-        // New variable
-        uint256 TIME_TO_REPLACE_WHILELIST;
-        uint256 TIME_TO_SWITCH_ONYONE;
-        uint256 MAX_SPEND_PER_BUYER_AFTER_SWITCH_ANYONE;
-        // ----------------------------------------------
     }
 
     struct PresaleFeeInfo {
@@ -54,11 +49,6 @@ contract Presale01 is ReentrancyGuard {
         uint256 TOTAL_TOKENS_WITHDRAWN; // total tokens withdrawn post successful presale
         uint256 TOTAL_BASE_WITHDRAWN; // total base tokens withdrawn on presale failure
         uint256 NUM_BUYERS; // number of unique participants
-        // New Variable--------------------------------   
-        bool WHITELIST_REPLACEMENT;
-        bool SWITCH_ANYONE;
-        // --------------------------------------------   
-
     }
 
     struct BuyerInfo {
@@ -67,7 +57,6 @@ contract Presale01 is ReentrancyGuard {
         uint256 lastWithdraw; // day of the last withdrawing. If first time => = firstDistributionType
         uint256 totalTokenWithdraw; // number of tokens withdraw
         bool isWithdrawnBase;
-        uint256 timeToBuyerTokens;
         // bool isRefunded; // refund or claim
     }
 
@@ -75,22 +64,13 @@ contract Presale01 is ReentrancyGuard {
         uint256 transferPresaleOwner;
         uint256 listOnUniswap;
     }
-
-    // struct VestingPeriod {
-    //     // if set time for user withdraw at listing : use same data in uint_params[11], otherwise set new Date for it
-    //     uint256 firstDistributionType;
-    //     uint256 firstUnlockRate;
-    //     uint256 distributionInterval;
-    //     uint256 unlockRateEachTime;
-    //     uint256 maxPeriod;
-    // }
-
+    // New struct vestingPeriod
     struct VestingPeriod {
         uint256 distributionTime; 
         uint256 unlockRate;
         bool statusWithDraw;
     }
-
+    // AllowRefundToken
     struct AllowRefundToken {
         uint256 refundFee; 
         uint256 refundTime;
@@ -119,7 +99,6 @@ contract Presale01 is ReentrancyGuard {
     mapping(address => uint256) public USER_FEES;
     uint256 public TOTAL_TOKENS_REFUNDED; // total tokens refund
     uint256 public TOTAL_FEES_REFUNDED; // total fees refund
-    mapping(address => BuyerInfo[]) public LIST_BUYER_INFO;
 
     constructor(address _presaleGenerator, address[] memory _admins) payable {
         PRESALE_GENERATOR = _presaleGenerator;
@@ -140,7 +119,7 @@ contract Presale01 is ReentrancyGuard {
         }
     }
 
-    function init1(address payable _presaleOwner, uint256[14] memory data)
+    function init1(address payable _presaleOwner, uint256[11] memory data)
         external
     {
         require(msg.sender == PRESALE_GENERATOR, "FORBIDDEN");
@@ -156,9 +135,6 @@ contract Presale01 is ReentrancyGuard {
         PRESALE_INFO.START_TIME = data[8];
         PRESALE_INFO.END_TIME = data[9];
         PRESALE_INFO.LOCK_PERIOD = data[10];
-        PRESALE_INFO.TIME_TO_REPLACE_WHILELIST = data[11];
-        PRESALE_INFO.TIME_TO_SWITCH_ONYONE = data[12];
-        PRESALE_INFO.MAX_SPEND_PER_BUYER_AFTER_SWITCH_ANYONE = data[13];
     }
 
     function init2(
@@ -181,23 +157,19 @@ contract Presale01 is ReentrancyGuard {
 
     function init3(
         bool is_white_list,
-        bool is_approve_refund,
-        bool is_white_replace,
-        bool is_switch_anyone,
         address payable _caller,
+        bool is_approve_refund,
         uint8 _addLP,
         uint256[2] memory data,
         uint8 _percentFee
     ) external {
         require(msg.sender == PRESALE_GENERATOR, "FORBIDDEN");
         STATUS.WHITELIST_ONLY = is_white_list;
-        STATUS.WHITELIST_REPLACEMENT = is_white_replace;
-        STATUS.SWITCH_ANYONE = is_switch_anyone;
         STATUS.IS_STATUS_APPPROVE_REFUND_TOKEN = is_approve_refund;
         CALLER = _caller;
-        PRESALE_INFO.ADD_LP = _addLP;
         ALLOW_REFUND_TOKEN.refundFee = data[0];
         ALLOW_REFUND_TOKEN.refundTime = data[1];
+        PRESALE_INFO.ADD_LP = _addLP;
         PERCENT_FEE = _percentFee;
     }
 
@@ -294,16 +266,9 @@ contract Presale01 is ReentrancyGuard {
         uint256 real_amount_in = amount_in;
         uint256 fee = 0;
         
-         if (!STATUS.WHITELIST_ONLY ) {
-            real_amount_in = real_amount_in * (1000 - PERCENT_FEE) / 1000;
+        if (!STATUS.WHITELIST_ONLY) {
+            real_amount_in = real_amount_in * (1000 - PERCENT_FEE)/ 1000;
             fee = amount_in - real_amount_in;
-        }else{
-            if(STATUS.SWITCH_ANYONE){
-                if(block.timestamp < PRESALE_INFO.TIME_TO_SWITCH_ONYONE){
-                    real_amount_in = real_amount_in * (1000 - PERCENT_FEE) / 1000;
-                    fee = amount_in - real_amount_in;
-                }
-            }
         }
         require(
             real_amount_in >= PRESALE_INFO.MIN_SPEND_PER_BUYER,
@@ -344,7 +309,6 @@ contract Presale01 is ReentrancyGuard {
         }
     }
 
-    // owner add new vesting period to LIST_VESTING_PERIOD array     
     function ownerAddNewVestingPeriod(uint256[] memory _distributionTime, uint256[] memory _unlockRate) external {
         require(_distributionTime.length == _unlockRate.length,"ARRAY MUST BE SAME LENGTH");
         for(uint i = 0 ; i < _distributionTime.length ; i++) {
@@ -403,13 +367,14 @@ contract Presale01 is ReentrancyGuard {
                 LIST_VESTING_PERIOD[i].statusWithDraw = true;
             }
         } 
+
         require(
             rateWithdrawAfter > 0,
             "User withdraw All token success!"
         );
 
         buyer.lastWithdraw = currentTime;
-        uint256 amountWithdraw = (tokensOwed * rateWithdrawAfter) / 100;
+        uint256 amountWithdraw = (tokensOwed * rateWithdrawAfter) / 100; 
 
         if (buyer.totalTokenWithdraw + amountWithdraw > buyer.tokensOwed) {
             amountWithdraw = buyer.tokensOwed - buyer.totalTokenWithdraw;
@@ -712,79 +677,40 @@ contract Presale01 is ReentrancyGuard {
         BuyerInfo storage buyer = BUYERS[msg.sender];
         require(!buyer.isWithdrawnBase, "NOTHING TO REFUND");
         require(buyer.totalTokenWithdraw == 0, "CANNOT REFUND");
-        bool userCanReFundTokens;
-
-        if(STATUS.WHITELIST_ONLY && !STATUS.SWITCH_ANYONE && !STATUS.SWITCH_ANYONE ||
-           STATUS.WHITELIST_ONLY && STATUS.SWITCH_ANYONE && !STATUS.SWITCH_ANYONE) {
-            userCanReFundTokens = true;
+        TOTAL_TOKENS_REFUNDED += buyer.baseDeposited - USER_FEES[msg.sender];
+        TOTAL_FEES_REFUNDED += USER_FEES[msg.sender];
+        // update vesting period => set hard data
+        if(STATUS.IS_STATUS_APPPROVE_REFUND_TOKEN){
+        // Check block time > listingTime + refundTime    
+            require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME + ALLOW_REFUND_TOKEN.refundTime, "NOT YET TIME TO REFUND TOKEN");
+            // Calculate fee for user 
+            uint256 realAmountForWithdraw = (1000 - ALLOW_REFUND_TOKEN.refundFee) * (buyer.baseDeposited - USER_FEES[msg.sender]);
+            // transfer fee for base token (With)           
+            TransferHelper.safeTransferBaseToken(
+                address(PRESALE_INFO.B_TOKEN),
+                payable(msg.sender),
+                realAmountForWithdraw,
+                !PRESALE_INFO.PRESALE_IN_ETH
+            );
+            //trasfer fee for base token
+            TransferHelper.safeTransferBaseToken(
+                address(PRESALE_INFO.B_TOKEN),
+                 PRESALE_FEE_INFO.BASE_FEE_ADDRESS,
+                buyer.baseDeposited - USER_FEES[msg.sender] - realAmountForWithdraw,
+                !PRESALE_INFO.PRESALE_IN_ETH
+            );
         }else{
-            if(STATUS.WHITELIST_ONLY && !STATUS.SWITCH_ANYONE && STATUS.SWITCH_ANYONE) {
-                for(uint256 i = 0; i < LIST_BUYER_INFO[msg.sender].length; i++){
-                    if(LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens > PRESALE_INFO.START_TIME && 
-                    LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens < PRESALE_INFO.TIME_TO_SWITCH_ONYONE) {
-                        userCanReFundTokens = true;
-                    }else{
-                        userCanReFundTokens = false;
-                        break;
-                    }
-                }
-            }else{
-                if(STATUS.WHITELIST_ONLY && STATUS.SWITCH_ANYONE && STATUS.SWITCH_ANYONE){
-                    if(PRESALE_INFO.TIME_TO_REPLACE_WHILELIST < PRESALE_INFO.TIME_TO_SWITCH_ONYONE){
-                        for(uint256 i = 0; i < LIST_BUYER_INFO[msg.sender].length; i++){
-                            if(LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens > PRESALE_INFO.START_TIME && 
-                            LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens < PRESALE_INFO.TIME_TO_SWITCH_ONYONE) {
-                                userCanReFundTokens = true;
-                            }else{
-                                userCanReFundTokens = false;
-                                break;
-                            }
-                        }
-                    }else{
-                        for(uint256 i = 0; i < LIST_BUYER_INFO[msg.sender].length; i++){
-                            if(LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens > PRESALE_INFO.START_TIME && 
-                            LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens < PRESALE_INFO.TIME_TO_SWITCH_ONYONE ||
-                            LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens > PRESALE_INFO.TIME_TO_REPLACE_WHILELIST && 
-                            LIST_BUYER_INFO[msg.sender][i].timeToBuyerTokens < PRESALE_INFO.END_TIME) {
-                                userCanReFundTokens = true;
-                            }else{
-                                userCanReFundTokens = false;
-                                break;
-                            }
-                        }
-                    }
-                }else{
-                    userCanReFundTokens = false;
-                }
-            }
+            // defauf transfer data
+            TransferHelper.safeTransferBaseToken(
+                address(PRESALE_INFO.B_TOKEN),
+                payable(msg.sender),
+                buyer.baseDeposited,
+                !PRESALE_INFO.PRESALE_IN_ETH
+            );
         }
-
-        if(userCanReFundTokens){
-            TOTAL_TOKENS_REFUNDED += buyer.baseDeposited - USER_FEES[msg.sender];
-            TOTAL_FEES_REFUNDED += USER_FEES[msg.sender];
-            if(STATUS.IS_STATUS_APPPROVE_REFUND_TOKEN){
-                require(block.timestamp > PRESALE_INFO.UNISWAP_LISTING_TIME + ALLOW_REFUND_TOKEN.refundTime, "NOT YET TIME TO REFUND TOKEN");
-                uint256 realAmountForWithdraw = (100 - ALLOW_REFUND_TOKEN.refundFee) * (buyer.baseDeposited - USER_FEES[msg.sender]);
-                TOTAL_TOKENS_REFUNDED += realAmountForWithdraw;
-                TransferHelper.safeTransferBaseToken(
-                    address(PRESALE_INFO.B_TOKEN),
-                    payable(msg.sender),
-                    realAmountForWithdraw,
-                    !PRESALE_INFO.PRESALE_IN_ETH
-                );
-            }else{
-                TOTAL_TOKENS_REFUNDED += buyer.baseDeposited - USER_FEES[msg.sender];
-                TransferHelper.safeTransferBaseToken(
-                    address(PRESALE_INFO.B_TOKEN),
-                    payable(msg.sender),
-                    buyer.baseDeposited,
-                    !PRESALE_INFO.PRESALE_IN_ETH
-                );
-            }
-            buyer.isWithdrawnBase = true;
-        }
+        buyer.isWithdrawnBase = true;
     }
-
+   
     function updateGasLimit(
         uint256 _transferPresaleOwner,
         uint256 _listOnUniswap
